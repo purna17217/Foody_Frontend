@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { API_Path } from '../api';
-import { Box, Grid, Typography, Card, CardContent, CardMedia, CardActionArea, Button } from '@mui/material';
+import { Box, Grid, Typography, Card, CardContent, CardMedia, CardActionArea, Button ,Skeleton} from '@mui/material';
 import { styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 
@@ -41,6 +41,7 @@ const StyledLink = styled(Link)({
 const FirmCollections = () => {
   const [firmData, setFirmData] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('All');
+  const [loading, setLoading] = useState(true);
 
   // Fetch firm data from the API
   const firmDataHandler = async () => {
@@ -51,6 +52,9 @@ const FirmCollections = () => {
     } catch (error) {
       alert('Firm Data not Found');
       console.error('Firm Data Not Found', error);
+    }
+    finally {
+            setLoading(false);
     }
   };
 
@@ -218,7 +222,24 @@ const FirmCollections = () => {
     </Box>
 
     <Grid container spacing={3}>
-  {firmData.length > 0 ? (
+  {loading ? (
+    // Show skeleton loaders while data is loading
+    Array.from(new Array(6)).map((_, index) => (
+      <Grid item xs={12} sm={6} md={4} key={index}>
+        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 3 }}>
+          <CardActionArea>
+            <Skeleton variant="rectangular" height={140} />
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Skeleton width="80%" />
+              <Skeleton width="60%" />
+              <Skeleton width="90%" />
+              <Skeleton width="70%" />
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      </Grid>
+    ))
+  ) : firmData.length > 0 ? (
     firmData.map((vendor) =>
       vendor.firm.map((item) => {
         // Check if the selected region matches or is "All"
@@ -268,8 +289,10 @@ const FirmCollections = () => {
       })
     )
   ) : (
-    <Typography variant="body1">No firm data available.</Typography>
+    <Typography variant="body1">No Restaurant data available.</Typography>
   )}
+  
+  
 </Grid>
 
     </Box>
